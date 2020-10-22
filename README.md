@@ -1,4 +1,4 @@
-For running 
+For running (before activate your virtual env and install requirements.txt) then
 
 `# cd src`
 
