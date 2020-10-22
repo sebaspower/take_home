@@ -1,0 +1,11 @@
+pandas
+fastapi
+uvicorn
+numpy
+requests
+dataclasses
+prometheus_client
+pydantic
+jsonpickle
+pytz
+timeloop
