@@ -6,13 +6,14 @@ import json
 column_names = ['user_id', 'appt', 'splan', 'end_date']
 def get_next_billing_date(subscription_date):
     subcription_day = subscription_date.strftime('%d')
-    billing_day = pd.Timestamp.now().strftime('%d')
-    billind_month_year = pd.Timestamp.now().strftime('%Y-%m')
-    if int(subcription_day)>int(billing_day):
-        return pd.Timestamp(billind_month_year+'-'+subcription_day)
+    now_day = pd.Timestamp.now().strftime('%d')
+    now_month = pd.Timestamp.now().strftime('%m')
+    now_year = pd.Timestamp.now().strftime('%Y')
+    if int(now_day) < int(subcription_day):
+        return pd.Timestamp(year=int(now_year), month=int(now_month), day=int(subcription_day))
     else:
-        print(billing_day+billind_month_year)
-        return pd.Timestamp(billind_month_year+'-'+billing_day)
+        return pd.Timestamp(year=int(now_year), day=int(subcription_day),
+                            month=1 if int(now_month) == 12 else int(now_month)+1)
 
 class UserInfo:
 
@@ -46,9 +47,11 @@ class UserInfo:
         index = self.input_data.index[self.input_data['user_id'] == user_id]
         if len(index) == 1:
             data= {"userId" :self.input_data._get_value(index[0],'user_id'),
-                "currentPlan":self.input_data._get_value(index[0],'splan'),
+                "currentPlan":self.input_data._get_value(index[0],'splan')
+                    if self.input_data._get_value(index[0],'is_active') == '1' else None,
                 "subscriptionStartDate":self.input_data._get_value(index[0],'appt').strftime('%m %d, %Y'),
-                "nextBillingDate": get_next_billing_date(self.input_data._get_value(index[0],'appt')).strftime('%m/%d/%Y'),
+                "nextBillingDate": get_next_billing_date(self.input_data._get_value(index[0],'appt')).strftime('%m/%d/%Y')
+                    if self.input_data._get_value(index[0],'is_active') == '1' else None,
                 "isActive" :"True" if self.input_data._get_value(index[0],'is_active') == '1' else "False"}
             return json.dumps(data)
         return None
